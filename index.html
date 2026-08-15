@@ -1,422 +1,505 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kuesioner Depresi — Santai</title>
-  <style>
-    :root{
-      --g1:#6d28d9; --g2:#2563eb; --card:rgba(255,255,255,0.06);
-      --accent:#9f7aea; --muted:#cbd5e1; --text:#eef2ff;
-      --soft-glow: 0 10px 40px rgba(159,122,234,0.16), 0 4px 12px rgba(59,130,246,0.06);
-      --popup-glow: 0 24px 80px rgba(79,38,217,0.16);
-      --transition-speed: 1s;
-    }
-    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,'Poppins',sans-serif}
-    html,body{height:100%;margin:0}
-    body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--g1),var(--g2));color:var(--text)}.menu-btn{position:fixed;top:18px;right:18px;font-size:22px;background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:none;color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer;backdrop-filter:blur(6px);z-index:120;box-shadow:var(--soft-glow);transition:transform .25s ease,opacity .25s ease}
-.menu-btn:hover{transform:scale(1.06)}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Tools Forge — Minecraft Resource Pack Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --bg: #0f0d0b;
+    --bg-panel: #18140f;
+    --bg-cell: #1c1712;
+    --line: #362d24;
+    --line-soft: #241e18;
+    --cream: #efe4d1;
+    --muted: #8f8577;
+    --copper: #c17a4f;
+    --copper-bright: #e0925f;
+    --ok: #6fae63;
+    --danger: #c1544f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% -10%, #241d17 0%, transparent 45%),
+      radial-gradient(circle at 95% 5%, #16201c 0%, transparent 40%),
+      var(--bg);
+    color:var(--cream);
+    font-family:'JetBrains Mono', monospace;
+    min-height:100vh;
+    padding:36px 24px 90px;
+  }
+  .wrap{max-width:1160px;margin:0 auto;}
+  .icon{display:inline-block;vertical-align:middle;flex-shrink:0;}
 
-.popup{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,7,18,0.45);backdrop-filter:blur(10px);z-index:200}
-.popup.hidden{opacity:0;pointer-events:none;transition:opacity var(--transition-speed) ease}
-.popup-content{width:92%;max-width:520px;padding:34px;border-radius:18px;background:linear-gradient(135deg, rgba(127,90,255,0.16), rgba(59,130,246,0.08));box-shadow:var(--popup-glow);text-align:center;color:var(--text);transform-origin:center;animation:popupIn .45s ease both}
-@keyframes popupIn{from{opacity:0;transform:scale(.85) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.popup.fadeOut{animation:popupOut var(--transition-speed) forwards}
-@keyframes popupOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.95)}}
+  header{margin-bottom:32px;}
+  .eyebrow{
+    font-family:'Press Start 2P', monospace;
+    font-size:9px;
+    letter-spacing:2px;
+    color:var(--copper-bright);
+    margin-bottom:16px;
+    display:flex;align-items:center;gap:10px;
+  }
+  h1{
+    font-family:'Press Start 2P', monospace;
+    font-size:22px;
+    line-height:1.7;
+    margin:0 0 12px;
+    color:var(--cream);
+    text-shadow: 3px 3px 0 #000;
+  }
+  h1 span{color:var(--copper-bright);}
+  .sub{color:var(--muted);font-size:13px;max-width:620px;line-height:1.8;}
 
-.popup h2{margin:0 0 12px;font-size:20px}
-.lang-row{display:flex;gap:12px;justify-content:center}
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    box-shadow: inset 0 0 0 1px #000, 0 6px 0 -4px #000;
+    padding:20px 22px;
+    margin-bottom:24px;
+  }
+  .controls{
+    display:flex;flex-wrap:wrap;gap:26px;align-items:flex-end;
+  }
+  .field{display:flex;flex-direction:column;gap:7px;}
+  .field label{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);}
+  .field input[type=text], .field input[type=number]{
+    background:#0c0a08;border:1px solid var(--line);color:var(--cream);
+    padding:9px 11px;border-radius:4px;font-family:inherit;font-size:13px;width:190px;
+  }
+  .field input[type=number]{width:90px;}
+  .field input:focus{outline:2px solid var(--copper-bright);outline-offset:1px;}
 
-.capsule{
-  position:relative;display:inline-block;padding:12px 26px;border-radius:999px;color:#051026;font-weight:800;border:none;cursor:pointer;overflow:hidden;z-index:0
-}
-.capsule:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#7c3aed,#60a5fa,#38bdf8,#7c3aed);background-size:300% 300%;filter:blur(6px);opacity:0.95;transform:translateZ(0);transition:opacity .3s ease;z-index:-2}
-.capsule:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.06),transparent);border-radius:999px;z-index:-1}
-.capsule.animate:before{animation:gradientShift 3s linear infinite}
-@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.capsule.glow{box-shadow:0 12px 40px rgba(99,102,241,0.14)}
-.capsule:hover{transform:scale(1.04)}
+  .status{
+    margin-left:auto;
+    display:flex;align-items:center;gap:10px;
+    font-size:12px;color:var(--muted);
+    background:#0c0a08;
+    border:1px solid var(--line);
+    padding:9px 14px;
+    border-radius:4px;
+  }
+  .status b{color:var(--cream);}
 
-/* ripple effect */
-.capsule:active::after {content:'';position:absolute;inset:0;background:rgba(255,255,255,0.12);border-radius:999px;animation:ripple 0.4s ease-out;}
-@keyframes ripple{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(0)}}
+  #downloadBtn{
+    font-family:'Press Start 2P', monospace;
+    font-size:11px;
+    display:flex;align-items:center;gap:10px;
+    background:var(--copper);
+    color:#1a1210;
+    border:none;
+    padding:14px 20px;
+    border-radius:4px;
+    cursor:pointer;
+    box-shadow: 0 4px 0 #7c4a2e, inset 0 0 0 1px rgba(255,255,255,0.15);
+    transition:transform .08s ease, background .1s ease;
+  }
+  #downloadBtn:hover:not(:disabled){background:var(--copper-bright);}
+  #downloadBtn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 #7c4a2e;}
+  #downloadBtn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none;}
 
-.capsule.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.06)}
+  /* grid */
+  .grid-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;}
+  .grid{
+    display:grid;
+    grid-template-columns: 138px repeat(6, minmax(130px,1fr));
+    min-width:940px;
+  }
+  .corner, .colhead, .rowhead{
+    background:#141009;
+    position:sticky;
+    z-index:2;
+    display:flex;align-items:center;justify-content:center;
+    padding:12px 8px;
+    border-bottom:1px solid var(--line);
+    border-right:1px solid var(--line-soft);
+  }
+  .corner{top:0;left:0;z-index:3;font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;}
+  .colhead{top:0;flex-direction:column;gap:8px;}
+  .colhead span{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--cream);}
+  .rowhead{
+    left:0;flex-direction:row;gap:10px;align-items:center;justify-content:flex-start;
+    font-size:11px;font-weight:700;
+  }
+  .tier-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px #0c0a08, 0 0 0 3px currentColor;}
 
-.shell{width:100%;max-width:1100px;padding:26px}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:20px;padding:26px;backdrop-filter:blur(8px);box-shadow:var(--soft-glow)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:flex;gap:12px;align-items:center}
-.dot{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#c084fc,#60a5fa);display:flex;align-items:center;justify-content:center;font-weight:800;color:#07203a}
-h1{font-size:20px;margin:0}
-p.lead{color:var(--muted);margin:6px 0 12px}
+  .cell{
+    border-bottom:1px solid var(--line-soft);
+    border-right:1px solid var(--line-soft);
+    background:var(--bg-cell);
+    padding:9px;
+    min-height:112px;
+    display:flex;flex-direction:column;gap:7px;
+    position:relative;
+    transition:background .15s;
+  }
+  .cell.dragover{background:#2a231d;outline:2px dashed var(--copper-bright);outline-offset:-4px;}
+  .cell.filled{background:#1b2119;}
 
-.splash{display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px}
-.quote-box{max-width:860px;padding:26px;border-radius:14px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));box-shadow:0 12px 44px rgba(3,7,18,0.45)}
-.quote{font-size:20px;line-height:1.4;opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .7s ease}
-.quote.show{opacity:1;transform:none}
-.quote-sub{margin-top:10px;color:var(--muted);font-size:13px;text-align:right}
-.splash-actions{display:flex;gap:12px}
+  .drop{
+    flex:1;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;
+    border:1px dashed var(--line);
+    border-radius:4px;
+    cursor:pointer;
+    text-align:center;
+    padding:6px;
+    color:var(--muted);
+  }
+  .drop:hover{border-color:var(--copper);}
+  .cell.filled .drop{border-style:solid;border-color:var(--ok);cursor:default;}
+  .drop input{display:none;}
+  .drop-label{font-size:9px;letter-spacing:.5px;}
+  .preview-icon{
+    width:34px;height:34px;
+    image-rendering:pixelated;
+    background-repeat:no-repeat;
+  }
 
-.quiz{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:18px}
-.panel{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
-.question-box{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));min-height:220px;display:flex;flex-direction:column;justify-content:space-between;transition:opacity var(--transition-speed) ease,transform var(--transition-speed) ease}
-.question-box.hidden{opacity:0;transform:translateY(10px)}
-.qnum{color:var(--muted);font-size:13px}
-.qtext{font-size:18px;margin:12px 0}
-.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.opt{padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text);cursor:pointer;transition:transform .18s ease,background .18s ease;box-shadow:0 8px 24px rgba(2,6,23,0.12)}
-.opt:hover{transform:translateY(-6px);background:linear-gradient(90deg, rgba(159,122,234,0.12), rgba(96,165,250,0.08))}
-.progress{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden;margin-top:12px}
-.progress i{display:block;height:100%;background:linear-gradient(90deg,#c084fc,#60a5fa);width:0%;transition:width calc(var(--transition-speed) / 1.2) cubic-bezier(.2,.9,.3,1)}
-.result{padding:16px;border-radius:12px;background:linear-gradient(90deg,rgba(159,122,234,0.06),rgba(96,165,250,0.03));}
-.result.warn{background:linear-gradient(90deg,rgba(255,99,132,0.06),rgba(255,50,90,0.03));}
+  .meta-row{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:var(--muted);}
+  .badge{
+    background:#0c0a08;border:1px solid var(--line);border-radius:10px;
+    padding:3px 8px;font-size:9px;color:var(--cream);
+  }
+  .clear-btn{
+    background:none;border:none;color:var(--danger);cursor:pointer;padding:2px;
+    display:flex;align-items:center;border-radius:3px;
+  }
+  .clear-btn:hover{background:rgba(193,84,79,0.12);}
 
-.meta{position:sticky;top:26px}
-.stat .big{font-size:28px;font-weight:700}
-.small{font-size:13px;color:var(--muted)}
-
-footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
-
-@media(max-width:980px){.quiz{grid-template-columns:1fr}.meta{position:static}}
-
-  </style>
+  footer{margin-top:34px;font-size:11px;color:var(--muted);line-height:1.9;}
+  footer code{background:#0c0a08;padding:1px 5px;border-radius:3px;color:var(--copper-bright);}
+  .note{
+    display:flex;gap:12px;align-items:flex-start;
+    border-left:3px solid var(--ok);
+    background:var(--bg-panel);
+    padding:14px 16px;
+    border-radius:0 6px 6px 0;
+    margin-top:18px;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.7;
+  }
+  .note .icon{color:var(--ok);margin-top:2px;}
+  .note b{color:var(--cream);}
+</style>
 </head>
 <body>
-  <button class="menu-btn" id="menuBtn" aria-label="Menu bahasa">☰</button>
-  <div class="popup" id="langPopup" aria-hidden="false">
-    <div class="popup-content" role="dialog" aria-modal="true">
-      <h2>Pilih Bahasa / Choose Language</h2>
-      <div class="lang-row">
-        <button class="lang-btn capsule" id="langID">🇮🇩 Bahasa Indonesia</button>
-        <button class="lang-btn capsule" id="langEN">🇬🇧 English</button>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow" id="eyebrow">MINECRAFT JAVA · PACK_FORMAT 88 (26.2)</div>
+    <h1>ANIMATED <span>TOOLS</span> FORGE</h1>
+    <p class="sub">Seret beberapa gambar frame ke tiap kotak — jumlah frame terdeteksi otomatis. Setiap tool × tier langsung punya preview animasi hidup, lalu unduh sebagai resource pack .zip yang siap dipakai.</p>
+  </header>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="field">
+        <label for="packName">Nama pack</label>
+        <input type="text" id="packName" value="Animated Tools Pack">
       </div>
-      <div style="margin-top:12px" class="small">Bisa ganti kapan saja lewat tombol ☰ di pojok kanan atas.</div>
-    </div>
-  </div>  <div class="shell">
-    <div class="card">
-      <div class="top">
-        <div class="logo"><div class="dot">Q</div><div><h1 id="title">Kuesioner Santai</h1><div class="small" id="subtitle">Refleksi singkat — santai aja.</div></div></div>
+      <div class="field">
+        <label for="frametime">Frametime (ticks)</label>
+        <input type="number" id="frametime" min="1" value="5">
       </div>
-      <div id="splash" class="splash">
-        <div class="quote-box">
-          <div id="quoteText" class="quote">Memuat kutipan...</div>
-          <div id="quoteSub" class="quote-sub">— Motivasi acak</div>
-        </div>
-        <div class="splash-actions">
-          <button class="capsule animate glow" id="startBtn">Ayo Mulai 🚀</button>
-          <button class="capsule ghost" id="shuffleBtn">Kutipan Lagi 🔁</button>
-        </div>
-      </div><div id="quizArea" style="display:none">
-    <div class="quiz">
-      <div class="panel">
-        <div id="box" class="question-box">
-          <div class="qnum" id="qnum">Pertanyaan 1/25</div>
-          <div class="qtext" id="qtext">...</div>
-          <div class="options" id="options"></div>
-          <div class="progress"><i id="bar"></i></div>
-        </div>
-        <div id="resultArea"></div>
-      </div>
-      <aside class="panel meta">
-        <div class="stat">
-          <div class="small">Progres</div>
-          <div class="big" id="statPercent">0%</div>
-          <div class="small">Skor sementara</div>
-        </div>
-        <div style="height:10px"></div>
-        <div class="small">Tips cepat</div>
-        <div class="small" id="quickTip">Jawab jujur, santai aja.</div>
-        <div style="height:10px"></div>
-        <div class="small">Bahasa: <span id="langLabel">ID</span></div>
-      </aside>
+      <div class="status" id="statusBox"><b id="filledCount">0</b>/42 item terisi</div>
+      <button id="downloadBtn" disabled></button>
     </div>
   </div>
-  <footer id="footer">Catatan: ini bukan diagnosis. Jika berisiko, cari bantuan profesional.</footer>
+
+  <div class="grid-scroll">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="note" id="noteBox"></div>
+
+  <footer>
+    Struktur pack yang dihasilkan: <code>assets/minecraft/textures/item/&lt;item_id&gt;.png</code> + <code>.png.mcmeta</code>, dengan <code>pack.mcmeta</code> di root memakai <code>min_format</code>/<code>max_format</code> 88 (format 26.2). Nama file diikuti konvensi vanilla, misalnya <code>wooden_sword</code>, <code>golden_pickaxe</code>, <code>copper_axe</code>, <code>netherite_hoe</code>, <code>diamond_spear</code>.
+  </footer>
+
 </div>
 
-  </div>  <script>
-const QUOTES_ID = [
-  {text:'Saya tidak memiliki bakat khusus. Saya hanya sangat ingin tahu.', author:'— Albert Einstein'},
-  {text:'Jika Anda ingin menemukan rahasia alam semesta, pikirkan dalam hal energi, frekuensi, dan getaran.', author:'— Nikola Tesla'},
-  {text:'Kemerdekaan sejati adalah kemerdekaan jiwa dan pikiran.', author:'— Tan Malaka'},
-  {text:'Kesuksesan bukanlah kunci kebahagiaan. Kebahagiaan adalah kunci kesuksesan.', author:'— Ferry Irwandi'},
-  {text:'Jangan pernah menyerah pada impian hanya karena waktu yang dibutuhkan untuk mencapainya.', author:'— Timothy Ronald'},
-  {text:'Risiko datang dari tidak mengetahui apa yang Anda lakukan.', author:'— Warren Buffett'},
-  {text:'Ketika sesuatu cukup penting, Anda melakukannya meskipun peluangnya tidak mendukung.', author:'— Elon Musk'},
-  {text:'Ingatlah untuk melihat bintang-bintang dan bukan ke bawah pada kaki Anda.', author:'— Stephen Hawking'},
-  {text:'Kegagalan adalah kesempatan untuk memulai lagi dengan lebih cerdas.', author:'— Henry Ford'},
-  {text:'Hidup itu proyek, bukan acara final.', author:'— Raka'},
-  {text:'Keberanian adalah harga yang harus dibayar untuk ketenangan jiwa.', author:'— Seneca'},
-  {text:'Jangan bandingkan bab pertamamu dengan bab akhir orang lain.', author:'— Unknown'},
-  {text:'Berpikir positif bukan berarti mengabaikan masalah, tapi memilih solusi.', author:'— Oprah Winfrey'},
-  {text:'Kesederhanaan adalah kunci kebahagiaan.', author:'— Lao Tzu'},
-  {text:'Kebahagiaan terbesar datang dari memberi.', author:'— Mother Teresa'},
-  {text:'Belajarlah dari kemarin, hiduplah untuk hari ini, berharaplah untuk esok.', author:'— Albert Einstein'},
-  {text:'Jika Anda tidak mencoba, Anda tidak akan pernah tahu.', author:'— Nikola Tesla'},
-  {text:'Impian besar membutuhkan keberanian besar.', author:'— Tan Malaka'},
-  {text:'Setiap hari adalah kesempatan baru untuk belajar dan berkembang.', author:'— Ferry Irwandi'},
-  {text:'Konsistensi lebih penting daripada intensitas sesaat.', author:'— Timothy Ronald'},
-  {text:'Investasi terbaik adalah investasi pada diri sendiri.', author:'— Warren Buffett'},
-  {text:'Jika Anda ingin sesuatu yang belum pernah Anda miliki, lakukan sesuatu yang belum pernah Anda lakukan.', author:'— Elon Musk'},
-  {text:'Jangan takut untuk gagal, takutlah untuk tidak mencoba.', author:'— Stephen Hawking'},
-  {text:'Kreativitas adalah kecerdasan yang bersenang-senang.', author:'— Albert Einstein'},
-  {text:'Energi mengikuti perhatian.', author:'— Nikola Tesla'},
-  {text:'Kemerdekaan tanpa disiplin adalah kekacauan.', author:'— Tan Malaka'},
-  {text:'Keberhasilan kecil setiap hari membangun kesuksesan besar.', author:'— Ferry Irwandi'},
-  {text:'Kesabaran adalah teman terbaik dalam perjalanan panjang.', author:'— Timothy Ronald'},
-  {text:'Diversifikasi adalah kunci mengurangi risiko.', author:'— Warren Buffett'},
-  {text:'Jika tidak ada yang percaya pada Anda, buat diri Anda sendiri percaya.', author:'— Elon Musk'},
-  {text:'Lihat ke atas, bukan ke bawah.', author:'— Stephen Hawking'},
-  {text:'Kegagalan hanyalah batu loncatan untuk sukses.', author:'— Henry Ford'},
-  {text:'Hidup sederhana, pikirkan jelas, lakukan dengan bijak.', author:'— Raka'},
-  {text:'Belajarlah dari orang lain, tetapi tetaplah menjadi diri sendiri.', author:'— Lao Tzu'},
-  {text:'Berikan tanpa mengharapkan kembali.', author:'— Mother Teresa'},
-  {text:'Jangan menyerah hanya karena hari ini sulit.', author:'— Albert Einstein'},
-  {text:'Inovasi muncul dari rasa ingin tahu.', author:'— Nikola Tesla'},
-  {text:'Kemerdekaan bukan berarti bebas dari tanggung jawab.', author:'— Tan Malaka'},
-  {text:'Perubahan kecil membawa perbedaan besar.', author:'— Ferry Irwandi'},
-  {text:'Ketika satu pintu tertutup, pintu lain terbuka.', author:'— Timothy Ronald'},
-  {text:'Pahami risiko sebelum bertindak.', author:'— Warren Buffett'},
-  {text:'Jangan tunggu motivasi datang, buatlah itu sendiri.', author:'— Elon Musk'},
-  {text:'Keterbatasan hanyalah ilusi.', author:'— Stephen Hawking'},
-  {text:'Belajar dari kesalahan lebih baik daripada menyesal.', author:'— Henry Ford'},
-  {text:'Kehidupan adalah perjalanan, nikmati setiap langkah.', author:'— Raka'},
-  {text:'Kesederhanaan adalah seni tertinggi.', author:'— Lao Tzu'},
-  {text:'Bekerjalah dengan cinta, bukan paksaan.', author:'— Mother Teresa'},
-  {text:'Hidup itu tentang pertumbuhan, bukan tujuan.', author:'— Albert Einstein'},
-  {text:'Sains tanpa imajinasi itu membosankan.', author:'— Nikola Tesla'},
-  {text:'Kemerdekaan sejati muncul dari kesadaran diri.', author:'— Tan Malaka'},
-  {text:'Kesuksesan adalah hasil dari kebiasaan baik.', author:'— Ferry Irwandi'},
-  {text:'Ketekunan mengalahkan bakat jika bakat tidak konsisten.', author:'— Timothy Ronald'},
-  {text:'Jangan menaruh semua telur di satu keranjang.', author:'— Warren Buffett'},
-  {text:'Jika gagal, coba lagi dengan lebih pintar.', author:'— Elon Musk'},
-  {text:'Jangan biarkan ketakutan menghalangi langkahmu.', author:'— Stephen Hawking'},
-  {text:'Kesalahan adalah guru terbaik.', author:'— Henry Ford'},
-  {text:'Nikmati prosesnya, bukan hanya hasilnya.', author:'— Raka'},
-  {text:'Sederhana tapi efektif.', author:'— Lao Tzu'},
-  {text:'Berikan tanpa mengharap kembali.', author:'— Mother Teresa'},
-  {text:'Pikiran positif menciptakan tindakan positif.', author:'— Albert Einstein'},
-  {text:'Energi adalah kunci untuk segala hal.', author:'— Nikola Tesla'},
-  {text:'Kemerdekaan bukan berarti tanpa batas.', author:'— Tan Malaka'},
-  {text:'Kebiasaan kecil membentuk karakter besar.', author:'— Ferry Irwandi'},
-  {text:'Kesabaran menghasilkan hasil yang hebat.', author:'— Timothy Ronald'},
-  {text:'Investasikan pada apa yang Anda pahami.', author:'— Warren Buffett'},
-  {text:'Lakukan sesuatu yang menakutkan setiap hari.', author:'— Elon Musk'},
-  {text:'Melihat jauh adalah bagian dari kebijaksanaan.', author:'— Stephen Hawking'},
-  {text:'Belajar dari setiap kegagalan.', author:'— Henry Ford'},
-  {text:'Hidup bukan perlombaan, tapi perjalanan.', author:'— Raka'},
-  {text:'Sederhana adalah kunci kebijaksanaan.', author:'— Lao Tzu'},
-  {text:'Cinta adalah motivasi terbesar.', author:'— Mother Teresa'},
-  {text:'Jangan takut mencoba hal baru.', author:'— Albert Einstein'},
-  {text:'Eksperimen adalah inti dari penemuan.', author:'— Nikola Tesla'},
-  {text:'Kesadaran diri adalah awal kebebasan.', author:'— Tan Malaka'},
-  {text:'Rutinitas baik menuntun pada sukses.', author:'— Ferry Irwandi'},
-  {text:'Ketekunan adalah rahasia keberhasilan.', author:'— Timothy Ronald'},
-  {text:'Pahami risiko sebelum mengambil langkah.', author:'— Warren Buffett'},
-  {text:'Jangan menyerah meski jalan sulit.', author:'— Elon Musk'},
-  {text:'Keterbatasan hanya ada di pikiran.', author:'— Stephen Hawking'},
-  {text:'Kegagalan adalah awal dari perbaikan.', author:'— Henry Ford'},
-  {text:'Nikmati setiap proses, bukan hanya tujuan.', author:'— Raka'},
-  {text:'Sederhana, tapi penuh makna.', author:'— Lao Tzu'},
-  {text:'Berikan dengan tulus, bukan karena harus.', author:'— Mother Teresa'},
-  {text:'Positifkan pikiranmu, positifkan hidupmu.', author:'— Albert Einstein'},
-  {text:'Energi menentukan hasil.', author:'— Nikola Tesla'},
-  {text:'Kemerdekaan membutuhkan tanggung jawab.', author:'— Tan Malaka'},
-  {text:'Kebiasaan baik membawa hasil besar.', author:'— Ferry Irwandi'},
-  {text:'Kesabaran adalah kunci ketahanan.', author:'— Timothy Ronald'},
-  {text:'Belajar adalah investasi terbaik.', author:'— Warren Buffett'},
-  {text:'Berani mencoba adalah awal inovasi.', author:'— Elon Musk'},
-  {text:'Melihat jauh adalah bagian dari visi.', author:'— Stephen Hawking'},
-  {text:'Kesalahan adalah guru terbaik dalam hidup.', author:'— Henry Ford'},
-  {text:'Nikmati proses perjalanan hidup.', author:'— Raka'},
-  {text:'Sederhana itu indah.', author:'— Lao Tzu'},
-  {text:'Cinta membuat hidup lebih bermakna.', author:'— Mother Teresa'},
-  {text:'Jangan takut gagal.', author:'— Albert Einstein'},
-  {text:'Eksperimen adalah inti inovasi.', author:'— Nikola Tesla'},
-  {text:'Kesadaran diri membawa kebebasan.', author:'— Tan Malaka'},
-  {text:'Rutinitas baik menuntun sukses.', author:'— Ferry Irwandi'},
-  {text:'Ketekunan membawa keberhasilan.', author:'— Timothy Ronald'},
-  {text:'Pahami risiko, minimalkan kerugian.', author:'— Warren Buffett'},
-  {text:'Jangan menyerah meski sulit.', author:'— Elon Musk'},
-  {text:'Keterbatasan ada di pikiran saja.', author:'— Stephen Hawking'},
-  {text:'Kegagalan adalah langkah awal sukses.', author:'— Henry Ford'},
-  {text:'Nikmati setiap proses kehidupan.', author:'— Raka'},
-  {text:'Sederhana tapi kuat.', author:'— Lao Tzu'},
-  {text:'Berikan dengan tulus, tanpa pamrih.', author:'— Mother Teresa'}
+<script>
+/* ---------- SVG icon set (stroke/fill based, no emoji) ---------- */
+const ICON_SIZE = 22;
+
+function svgWrap(inner, size=ICON_SIZE){
+  return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none">${inner}</svg>`;
+}
+
+// shared diagonal handle, local space after rotate(-45) around (12,12)
+const HANDLE = `<rect x="-9" y="-1.3" width="9" height="2.6" rx="1.3" fill="currentColor" opacity="0.5"/>`;
+
+const TOOL_HEADS = {
+  sword: `<path d="M-1,-1.6 L7,-1.6 L9.5,0 L7,1.6 L-1,1.6 Z" fill="currentColor"/>
+          <rect x="-2.2" y="-3.2" width="1.6" height="6.4" rx="0.8" fill="currentColor"/>
+          <circle cx="-9" cy="0" r="1.7" fill="currentColor"/>`,
+  spear: `<path d="M-1,-0.9 L10.5,0 L-1,0.9 Z" fill="currentColor"/>`,
+  shovel: `<path d="M4.5,-3.4 L9.3,-2.4 Q10.3,0 9.3,2.4 L4.5,3.4 Q2.8,0 4.5,-3.4 Z" fill="currentColor"/>`,
+  axe: `<path d="M-1,-1.6 L6.5,-6.2 Q10.5,-3 9.3,1 Q8,3 5,2.4 L-1,1.6 Z" fill="currentColor"/>`,
+  hoe: `<rect x="6.2" y="-4" width="2.2" height="8" rx="1" fill="currentColor"/>`,
+  pickaxe: `<path d="M-1,0 Q3,-7.4 9.6,-6.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M-1,0 Q3,7.4 9.6,6.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>`,
+};
+
+function toolIconSVG(key, size){
+  const head = TOOL_HEADS[key] || '';
+  return svgWrap(`<g transform="translate(12,12) rotate(-45)">${HANDLE}${head}</g>`, size);
+}
+
+const ICON_UPLOAD = svgWrap(`<path d="M12 16V5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+  <path d="M7.5 9.5L12 5l4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M5 16.5v1.8a1.7 1.7 0 0 0 1.7 1.7h10.6a1.7 1.7 0 0 0 1.7-1.7v-1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/>`, 18);
+
+const ICON_DOWNLOAD = svgWrap(`<path d="M12 4v11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M7.5 10.5L12 15l4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M5 17v1.8A1.7 1.7 0 0 0 6.7 20.5h10.6a1.7 1.7 0 0 0 1.7-1.7V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>`, 16);
+
+const ICON_TRASH = svgWrap(`<path d="M5 7h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M9.5 7V5.3A1.3 1.3 0 0 1 10.8 4h2.4A1.3 1.3 0 0 1 14.5 5.3V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <path d="M7.2 7l.7 11.2A1.6 1.6 0 0 0 9.5 19.7h5a1.6 1.6 0 0 0 1.6-1.5L16.8 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`, 14);
+
+const ICON_CHECK = svgWrap(`<path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`, 15);
+
+/* ---------- data ---------- */
+const MATERIALS = [
+  {key:'wood', label:'Wood', prefix:'wooden', color:'#a97c4f'},
+  {key:'stone', label:'Stone', prefix:'stone', color:'#9b968e'},
+  {key:'copper', label:'Copper', prefix:'copper', color:'#c17a4f'},
+  {key:'iron', label:'Iron', prefix:'iron', color:'#d8d3c8'},
+  {key:'gold', label:'Gold', prefix:'golden', color:'#e0b93c'},
+  {key:'diamond', label:'Diamond', prefix:'diamond', color:'#5fd6d0'},
+  {key:'netherite', label:'Netherite', prefix:'netherite', color:'#a97e84'},
+];
+const TOOLS = [
+  {key:'sword', label:'Sword'},
+  {key:'spear', label:'Spear'},
+  {key:'shovel', label:'Shovel'},
+  {key:'axe', label:'Axe'},
+  {key:'hoe', label:'Hoe'},
+  {key:'pickaxe', label:'Pickaxe'},
 ];
 
-const QUOTES_EN = [
-  {text:"I have no special talent. I am only passionately curious.", author:"— Albert Einstein"},
-  {text:"If you want to find the secrets of the universe, think in terms of energy, frequency, and vibration.", author:"— Nikola Tesla"},
-  {text:"True independence is the freedom of the soul and mind.", author:"— Tan Malaka"},
-  {text:"Success is not the key to happiness. Happiness is the key to success.", author:"— Ferry Irwandi"},
-  {text:"Never give up on a dream just because of the time it will take to accomplish it.", author:"— Timothy Ronald"},
-  {text:"Risk comes from not knowing what you are doing.", author:"— Warren Buffett"},
-  {text:"When something is important enough, you do it even if the odds are not in your favor.", author:"— Elon Musk"},
-  {text:"Remember to look up at the stars and not down at your feet.", author:"— Stephen Hawking"},
-  {text:"Failure is an opportunity to start again more intelligently.", author:"— Henry Ford"},
-  {text:"Life is a project, not a final exam.", author:"— Raka"},
-  {text:"Simplicity is the highest form of sophistication.", author:"— Lao Tzu"},
-  {text:"Give without expecting anything in return.", author:"— Mother Teresa"},
-  {text:"Learn from yesterday, live for today, hope for tomorrow.", author:"— Albert Einstein"},
-  {text:"If you don't try, you'll never know.", author:"— Nikola Tesla"},
-  {text:"Big dreams require big courage.", author:"— Tan Malaka"},
-  {text:"Every day is a new opportunity to learn and grow.", author:"— Ferry Irwandi"},
-  {text:"Consistency is more important than intensity.", author:"— Timothy Ronald"},
-  {text:"The best investment is an investment in yourself.", author:"— Warren Buffett"},
-  {text:"If you want something you've never had, do something you've never done.", author:"— Elon Musk"},
-  {text:"Do not fear failure; fear not trying.", author:"— Stephen Hawking"},
-  {text:"Creativity is intelligence having fun.", author:"— Albert Einstein"},
-  {text:"Energy follows attention.", author:"— Nikola Tesla"},
-  {text:"Freedom without discipline is chaos.", author:"— Tan Malaka"},
-  {text:"Small successes each day build big success.", author:"— Ferry Irwandi"},
-  {text:"Patience is your best friend on a long journey.", author:"— Timothy Ronald"},
-  {text:"Diversification is key to reducing risk.", author:"— Warren Buffett"},
-  {text:"If no one believes in you, make yourself believe.", author:"— Elon Musk"},
-  {text:"Look up, not down.", author:"— Stephen Hawking"},
-  {text:"Failure is just a stepping stone to success.", author:"— Henry Ford"},
-  {text:"Live simply, think clearly, act wisely.", author:"— Raka"},
-  {text:"Learn from others, but remain yourself.", author:"— Lao Tzu"},
-  {text:"Give without expecting anything back.", author:"— Mother Teresa"},
-  {text:"Do not give up just because today is hard.", author:"— Albert Einstein"},
-  {text:"Innovation comes from curiosity.", author:"— Nikola Tesla"},
-  {text:"True independence comes from self-awareness.", author:"— Tan Malaka"},
-  {text:"Good habits lead to success.", author:"— Ferry Irwandi"},
-  {text:"Persistence beats talent if talent is inconsistent.", author:"— Timothy Ronald"},
-  {text:"Don't put all your eggs in one basket.", author:"— Warren Buffett"},
-  {text:"If you fail, try again smarter.", author:"— Elon Musk"},
-  {text:"Do not let fear stop you.", author:"— Stephen Hawking"},
-  {text:"Mistakes are the best teachers.", author:"— Henry Ford"},
-  {text:"Enjoy the journey, not just the outcome.", author:"— Raka"},
-  {text:"Simple but effective.", author:"— Lao Tzu"},
-  {text:"Give with sincerity, not obligation.", author:"— Mother Teresa"},
-  {text:"Positive thinking creates positive actions.", author:"— Albert Einstein"},
-  {text:"Energy is key to everything.", author:"— Nikola Tesla"},
-  {text:"Freedom requires responsibility.", author:"— Tan Malaka"},
-  {text:"Small habits shape great character.", author:"— Ferry Irwandi"},
-  {text:"Patience yields great results.", author:"— Timothy Ronald"},
-  {text:"Learning is the best investment.", author:"— Warren Buffett"},
-  {text:"Be brave enough to try new things.", author:"— Elon Musk"},
-  {text:"Looking far is part of wisdom.", author:"— Stephen Hawking"},
-  {text:"Learn from every failure.", author:"— Henry Ford"},
-  {text:"Life is not a race, but a journey.", author:"— Raka"},
-  {text:"Simplicity is beautiful.", author:"— Lao Tzu"},
-  {text:"Love is the greatest motivation.", author:"— Mother Teresa"},
-  {text:"Do not fear failure.", author:"— Albert Einstein"},
-  {text:"Experimentation is the heart of discovery.", author:"— Nikola Tesla"},
-  {text:"Self-awareness brings freedom.", author:"— Tan Malaka"},
-  {text:"Good routines lead to success.", author:"— Ferry Irwandi"},
-  {text:"Persistence brings achievement.", author:"— Timothy Ronald"},
-  {text:"Understand risks before acting.", author:"— Warren Buffett"},
-  {text:"Do not give up even if the road is tough.", author:"— Elon Musk"},
-  {text:"Limitations exist only in the mind.", author:"— Stephen Hawking"},
-  {text:"Failure is the first step to improvement.", author:"— Henry Ford"},
-  {text:"Enjoy every part of life's process.", author:"— Raka"},
-  {text:"Simple but strong.", author:"— Lao Tzu"},
-  {text:"Give sincerely, without expecting anything.", author:"— Mother Teresa"},
-  {text:"Keep your mind positive, keep your life positive.", author:"— Albert Einstein"},
-  {text:"Energy determines results.", author:"— Nikola Tesla"},
-  {text:"Freedom requires responsibility.", author:"— Tan Malaka"},
-  {text:"Good habits bring big results.", author:"— Ferry Irwandi"},
-  {text:"Patience is the key to resilience.", author:"— Timothy Ronald"},
-  {text:"Learning is the best investment.", author:"— Warren Buffett"},
-  {text:"Dare to try is the start of innovation.", author:"— Elon Musk"},
-  {text:"Looking far is part of vision.", author:"— Stephen Hawking"},
-  {text:"Mistakes are the best teachers in life.", author:"— Henry Ford"},
-  {text:"Enjoy the process of life.", author:"— Raka"},
-  {text:"Simple is beautiful.", author:"— Lao Tzu"},
-  {text:"Love makes life meaningful.", author:"— Mother Teresa"},
-  {text:"Do not fear failure.", author:"— Albert Einstein"},
-  {text:"Experimentation is the core of innovation.", author:"— Nikola Tesla"},
-  {text:"Self-awareness brings freedom.", author:"— Tan Malaka"},
-  {text:"Good routines lead to success.", author:"— Ferry Irwandi"},
-  {text:"Persistence leads to achievement.", author:"— Timothy Ronald"},
-  {text:"Understand risk, minimize loss.", author:"— Warren Buffett"},
-  {text:"Do not give up even if it is difficult.", author:"— Elon Musk"},
-  {text:"Limitations exist only in the mind.", author:"— Stephen Hawking"},
-  {text:"Failure is the first step to success.", author:"— Henry Ford"},
-  {text:"Enjoy every part of life.", author:"— Raka"},
-  {text:"Simple but strong.", author:"— Lao Tzu"},
-  {text:"Give sincerely, without expecting.", author:"— Mother Teresa"}
-];
-    const Q_ID = [
-      "Kurang minat atau kesenangan melakukan aktivitas sehari-hari","Merasa sedih, murung, atau putus asa","Kesulitan tidur atau tidur berlebihan","Kelelahan atau kurang energi","Nafsu makan berkurang atau makan berlebihan","Merasa tidak berguna atau gagal","Kesulitan fokus dalam pekerjaan atau hal kecil","Bergerak atau bicara lebih lambat atau gelisah berlebihan","Pikiran lebih baik mati atau menyakiti diri sendiri","Menarik diri dari orang lain atau menghindari interaksi sosial","Merasa cemas berlebihan atau sulit tenang","Kehilangan motivasi untuk masa depan","Sering merasa bersalah tanpa alasan yang jelas","Merasa hidup tidak memiliki tujuan","Sulit menikmati hal-hal kecil yang biasanya menyenangkan","Sering membandingkan diri dengan orang lain dan merasa kurang","Merasa hampa secara emosional","Sulit membuat keputusan sederhana","Kehilangan rasa percaya diri","Merasa tidak berdaya menghadapi masalah","Mudah tersinggung tanpa alasan jelas","Menunda pekerjaan karena tidak punya energi","Sering merasa terisolasi meskipun bersama orang lain","Merasa masa depan tampak suram","Kesulitan menemukan hal yang membuat bahagia"
-    ];
+document.getElementById('eyebrow').innerHTML = toolIconSVG('pickaxe', 13) + `<span>MINECRAFT JAVA · PACK_FORMAT 88 (26.2)</span>`;
+document.getElementById('downloadBtn').innerHTML = ICON_DOWNLOAD + `<span>DOWNLOAD .ZIP</span>`;
+document.getElementById('noteBox').innerHTML = ICON_CHECK + `<div><b>Spear sudah item vanilla resmi</b> sejak update Mounts of Mayhem, tersedia dari tier wood sampai netherite. Texture yang kamu upload langsung terpakai in-game tanpa perlu model custom.</div>`;
 
-    const Q_EN = [
-      'Little interest or pleasure in doing things','Feeling down, depressed, or hopeless','Trouble falling or staying asleep, or sleeping too much','Feeling tired or having little energy','Poor appetite or overeating','Feeling bad about yourself or that you are a failure','Trouble concentrating on things, such as work or reading','Moving or speaking slowly, or being fidgety or restless','Thoughts that you would be better off dead or hurting yourself','Withdrawing from social interactions','Feeling anxious or unable to relax','Losing motivation for the future','Feeling guilty for no clear reason','Feeling like life has no purpose','Unable to enjoy things you used to like','Comparing yourself to others and feeling inadequate','Feeling emotionally empty','Difficulty making simple decisions','Losing self-confidence','Feeling powerless to face problems','Getting irritated easily','Procrastinating because of low energy','Feeling isolated even with people around','Seeing the future as bleak','Struggling to find things that make you happy'
-    ];
+const grid = document.getElementById('grid');
+const state = {}; // itemId -> {frameCount, dataURL, frameW, frameH}
 
-    const OPTS_ID = ['Tidak sama sekali','Beberapa hari','Lebih dari separuh waktu','Hampir setiap hari'];
-    const OPTS_EN = ['Not at all','Several days','More than half the days','Nearly every day'];
+function itemId(material, tool){ return `${material.prefix}_${tool.key}`; }
 
-    function randQuote(){ const q=(lang==='id')? QUOTES_ID: QUOTES_EN; return q[Math.floor(Math.random()*q.length)]; }
-    const menuBtn = document.getElementById('menuBtn');
-    const langPopup = document.getElementById('langPopup');
-    const langID = document.getElementById('langID');
-    const langEN = document.getElementById('langEN');
-    const quoteText = document.getElementById('quoteText');
-    const quoteSub = document.getElementById('quoteSub');
-    const startBtn = document.getElementById('startBtn');
-    const shuffleBtn = document.getElementById('shuffleBtn');
-    const splash = document.getElementById('splash');
-    const quizArea = document.getElementById('quizArea');
-    const box = document.getElementById('box');
-    const qnum = document.getElementById('qnum');
-    const qtext = document.getElementById('qtext');
-    const optionsEl = document.getElementById('options');
-    const bar = document.getElementById('bar');
-    const statPercent = document.getElementById('statPercent');
-    const quickTip = document.getElementById('quickTip');
-    const langLabel = document.getElementById('langLabel');
-    const resultArea = document.getElementById('resultArea');
-    const titleEl = document.getElementById('title');
-    const subtitleEl = document.getElementById('subtitle');
-    const footerEl = document.getElementById('footer');
-    let lang='id';
-    function updateProgress(){ const pct = Math.round((answers.length/qs.length)*100); bar.style.width = pct + '%'; statPercent.textContent = pct + '%'; }
-    function showQuote(){ const q=randQuote(); quoteText.classList.remove('show'); setTimeout(()=>{ quoteText.textContent='❝ '+q.text+' ❞'; quoteSub.textContent=q.author; quoteText.classList.add('show'); },120); }
-    startBtn.addEventListener('click',()=>{ startQuiz(); });
-    shuffleBtn.addEventListener('click',()=>{ showQuote(); });
-    menuBtn.addEventListener('click',()=>{ langPopup.classList.remove('hidden'); langPopup.style.display='flex'; langPopup.classList.remove('fadeOut'); });
-    langID.addEventListener('click',()=>{ lang='id'; showQuote(); langPopup.classList.add('fadeOut'); setTimeout(()=>{ langPopup.style.display='none'; langPopup.classList.remove('fadeOut'); },1000); });
-    langEN.addEventListener('click',()=>{ lang='en'; showQuote(); langPopup.classList.add('fadeOut'); setTimeout(()=>{ langPopup.style.display='none'; langPopup.classList.remove('fadeOut'); },1000); });
-    (function init(){ showQuote(); langPopup.style.display='flex'; })();
-    function restartQuiz(){ idx=0; answers=[]; resultArea.innerHTML=''; box.style.display='block'; // go back to splash
-      quizArea.style.transition = `opacity ${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--transition-speed'))} ease`;
-      quizArea.style.opacity = 0; setTimeout(()=>{ quizArea.style.display='none'; splash.style.display='flex'; splash.style.opacity = 0; setTimeout(()=>{ splash.style.transition = `opacity ${getComputedStyle(document.documentElement).getPropertyValue('--transition-speed')} ease`; splash.style.opacity = 1; // refresh quote
-        quoteText.classList.remove('show'); setTimeout(()=>{ quoteText.textContent = (lang==='id')? rand(QUOTES_ID) : rand(QUOTES_EN); quoteText.classList.add('show'); }, 160);
-      }, 60); }, 900);
+function el(tag, cls){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  return e;
+}
+
+// header row
+const corner = el('div','corner'); corner.textContent = 'TIER \\ TOOL';
+grid.appendChild(corner);
+TOOLS.forEach(t=>{
+  const c = el('div','colhead');
+  c.innerHTML = toolIconSVG(t.key, 22) + `<span>${t.label}</span>`;
+  grid.appendChild(c);
+});
+
+MATERIALS.forEach(mat=>{
+  const rh = el('div','rowhead');
+  rh.innerHTML = `<span class="tier-dot" style="color:${mat.color}"></span><span>${mat.label}</span>`;
+  grid.appendChild(rh);
+
+  TOOLS.forEach(tool=>{
+    const id = itemId(mat, tool);
+    const cell = el('div','cell');
+    cell.dataset.id = id;
+
+    const drop = el('div','drop');
+    drop.innerHTML = `${ICON_UPLOAD}<span class="drop-label">drop frames</span>
+      <input type="file" accept="image/png,image/*" multiple>`;
+    cell.appendChild(drop);
+
+    const metaRow = el('div','meta-row');
+    metaRow.innerHTML = `<span class="badge" data-role="count">0 frame</span><button class="clear-btn" style="display:none">${ICON_TRASH}</button>`;
+    cell.appendChild(metaRow);
+
+    grid.appendChild(cell);
+    wireDrop(id, cell);
+
+    metaRow.querySelector('.clear-btn').addEventListener('click', e=>{
+      e.stopPropagation();
+      clearCell(id, cell);
+    });
+  });
+});
+
+function wireDrop(id, cell){
+  const drop = cell.querySelector('.drop');
+  const input = drop.querySelector('input');
+  input.addEventListener('change', e => handleFiles(id, cell, e.target.files));
+  drop.addEventListener('click', ()=>{ if(!cell.classList.contains('filled')) input.click(); });
+  ['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e=>{
+    e.preventDefault(); cell.classList.add('dragover');
+  }));
+  ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e=>{
+    e.preventDefault(); cell.classList.remove('dragover');
+  }));
+  drop.addEventListener('drop', e=>{
+    const files = e.dataTransfer.files;
+    if(files && files.length) handleFiles(id, cell, files);
+  });
+}
+
+function naturalSort(files){
+  return [...files].sort((a,b)=> a.name.localeCompare(b.name, undefined, {numeric:true, sensitivity:'base'}));
+}
+
+async function handleFiles(id, cell, fileList){
+  const files = naturalSort(fileList).filter(f => f.type.startsWith('image/'));
+  if(!files.length) return;
+
+  const imgs = await Promise.all(files.map(f => loadImage(f)));
+  const frameW = imgs[0].width;
+  const frameH = imgs[0].height;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = frameW;
+  canvas.height = frameH * imgs.length;
+  const ctx = canvas.getContext('2d');
+  imgs.forEach((img, i) => {
+    ctx.drawImage(img, 0, i*frameH, frameW, frameH);
+  });
+
+  const dataURL = canvas.toDataURL('image/png');
+  state[id] = { frameCount: imgs.length, dataURL, frameW, frameH };
+
+  renderCell(id, cell);
+  updateStatus();
+}
+
+function loadImage(file){
+  return new Promise((resolve, reject)=>{
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = ()=> resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+function renderCell(id, cell){
+  const data = state[id];
+  cell.classList.add('filled');
+  const drop = cell.querySelector('.drop');
+  const frametime = Math.max(1, parseInt(document.getElementById('frametime').value || '5', 10));
+  const perFrameSec = frametime / 20;
+  const totalSec = perFrameSec * data.frameCount;
+
+  drop.innerHTML = `<div class="preview-icon" id="prev-${id}"></div>`;
+
+  const styleId = `style-${id}`;
+  let styleTag = document.getElementById(styleId);
+  if(!styleTag){
+    styleTag = document.createElement('style');
+    styleTag.id = styleId;
+    document.head.appendChild(styleTag);
+  }
+  styleTag.textContent = `
+    #prev-${id}{
+      background-image:url(${data.dataURL});
+      background-size: 34px auto;
+      animation: play-${id} ${totalSec}s steps(${data.frameCount}) infinite;
     }
-    function showResult(){ const total = answers.reduce((a,b)=>a+b,0); const max = qs.length * 3; const percent = (total/max)*100; let message=''; if(percent>85) message = (lang==='id')? 'Kamu terlalu banyak melihat kondisi yang buruk.' : "You're seeing too much of the bad side."; else if(percent>50) message = (lang==='id')? 'Apakah kamu baik-baik saja?' : 'Are you okay?'; else if(percent>25) message = (lang==='id')? 'Kamu sudah dewasa.' : "You're quite mature."; else message = (lang==='id')? 'Kamu masih anak-anak.' : "You\'re still young at heart.";
-
-      const resWrap = document.createElement('div'); resWrap.className = 'result' + ((percent>50)? ' warn' : '');
-      // dynamic vibrant restart button as capsule
-      const restartLabel = (lang==='id')? 'Coba Lagi 🔁' : 'Try Again 🔁';
-      resWrap.innerHTML = `<h3>${(lang==='id')? 'Hasil Kamu' : 'Your Result'}</h3>
-        <p>${(lang==='id')? 'Skor' : 'Score'}: <strong>${total}</strong> / ${max}</p>
-        <p>${(lang==='id')? 'Persentase' : 'Percentage'}: <strong>${percent.toFixed(1)}%</strong></p>
-        <p style="margin-top:8px;font-weight:600">${message}</p>
-        <div style="margin-top:8px;color:var(--muted)">${(lang==='id')? 'Ini hanya indikasi. Jika merasa berisiko, segera cari bantuan profesional.' : 'This is only an indication. If you feel at risk, seek professional help immediately.'}</div>
-        <div style="margin-top:12px"><button id='restartBtn' class='capsule animate glow'>${restartLabel}</button></div>`;
-
-      box.style.display = 'none'; resultArea.innerHTML = ''; resultArea.appendChild(resWrap);
-      // animate gradient on restart
-      document.getElementById('restartBtn').classList.add('animate');
-      document.getElementById('restartBtn').addEventListener('click', ()=>{ restartQuiz(); });
+    @keyframes play-${id}{
+      from{ background-position-y: 0; }
+      to{ background-position-y: -${34*data.frameCount}px; }
     }
-    function startQuiz(){ qs = (lang==='id')? Q_ID.slice() : Q_EN.slice(); qs = qs.sort(()=>Math.random()-0.5); idx=0; answers=[];
+  `;
 
-      splash.style.transition = `opacity ${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--transition-speed'))} ease`;
-      splash.style.opacity = 0;
-      setTimeout(()=>{ splash.style.display='none'; quizArea.style.display='block'; quizArea.style.opacity = 0; setTimeout(()=>{ quizArea.style.transition = `opacity ${getComputedStyle(document.documentElement).getPropertyValue('--transition-speed')} ease`; quizArea.style.opacity = 1; renderQuestion(); }, 60); }, 900); }
-    function renderQuestion(){
-      if(idx>=qs.length) return showResult();
-      box.classList.remove('hidden'); qnum.textContent = (lang==='id')? `Pertanyaan ${idx+1} dari ${qs.length}` : `Question ${idx+1} of ${qs.length}`; qtext.textContent = qs[idx]; optionsEl.innerHTML = '';
-      const opts = (lang==='id')? OPTS_ID : OPTS_EN;
-      opts.forEach((t,i)=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=t; b.onclick = ()=>{ answers.push(i); idx++; updateProgress(); box.classList.add('hidden'); setTimeout(()=>{ renderQuestion(); }, 420); }; optionsEl.appendChild(b); });
+  cell.querySelector('[data-role="count"]').textContent = `${data.frameCount} frame`;
+  cell.querySelector('.clear-btn').style.display = 'inline-flex';
+}
+
+function clearCell(id, cell){
+  delete state[id];
+  cell.classList.remove('filled');
+  const drop = cell.querySelector('.drop');
+  drop.innerHTML = `${ICON_UPLOAD}<span class="drop-label">drop frames</span>
+    <input type="file" accept="image/png,image/*" multiple>`;
+  wireDrop(id, cell);
+
+  cell.querySelector('[data-role="count"]').textContent = '0 frame';
+  cell.querySelector('.clear-btn').style.display = 'none';
+  const styleTag = document.getElementById(`style-${id}`);
+  if(styleTag) styleTag.remove();
+  updateStatus();
+}
+
+function updateStatus(){
+  const count = Object.keys(state).length;
+  document.getElementById('filledCount').textContent = count;
+  document.getElementById('downloadBtn').disabled = count === 0;
+}
+
+document.getElementById('frametime').addEventListener('input', ()=>{
+  Object.keys(state).forEach(id=>{
+    const cell = grid.querySelector(`.cell[data-id="${id}"]`);
+    if(cell) renderCell(id, cell);
+  });
+});
+
+document.getElementById('downloadBtn').addEventListener('click', async ()=>{
+  const btn = document.getElementById('downloadBtn');
+  btn.disabled = true;
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = `<span>MEMBANGUN...</span>`;
+
+  const zip = new JSZip();
+  const frametime = Math.max(1, parseInt(document.getElementById('frametime').value || '5', 10));
+  const packName = document.getElementById('packName').value || 'Animated Tools Pack';
+
+  zip.file('pack.mcmeta', JSON.stringify({
+    pack: {
+      description: packName,
+      min_format: 88,
+      max_format: 88
     }
-  </script></body>
+  }, null, 2));
+
+  const texFolder = zip.folder('assets/minecraft/textures/item');
+
+  Object.entries(state).forEach(([id, data])=>{
+    const base64 = data.dataURL.split(',')[1];
+    texFolder.file(`${id}.png`, base64, {base64:true});
+    texFolder.file(`${id}.png.mcmeta`, JSON.stringify({
+      animation: {
+        frametime: frametime,
+        frames: Array.from({length: data.frameCount}, (_,i)=>i)
+      }
+    }, null, 2));
+  });
+
+  const blob = await zip.generateAsync({type:'blob'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${packName.replace(/[^a-z0-9\-_]+/gi,'_')}.zip`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+
+  btn.innerHTML = originalHTML;
+  btn.disabled = Object.keys(state).length === 0;
+});
+</script>
+</body>
 </html>
